@@ -35,6 +35,14 @@ button {
   font-size: 14px;
 }
 
+input[type="text"] {
+  width: 100%;
+  max-width: 350px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 input,
 select {
   border: 1px solid #ccc;
