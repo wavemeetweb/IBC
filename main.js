@@ -37,7 +37,7 @@ function updateCustomerTable() {
       <td>${escapeHTML(c.name)}</td>
       <td>${escapeHTML(c.email)}</td>
       <td>${escapeHTML(c.phone)}</td>
-      <td>${escapeHTML(c.serviceProblem)}</td>
+      <td>${escapeHTML(c.service)}</td>
       <td>${entryDateFormatted}</td>
       <td>${returnDateFormatted}</td>
       <td><button class="delete-btn" onclick="deleteCustomerById(${c.id})" aria-label="Delete Entry">Delete</button></td>
@@ -53,7 +53,7 @@ document.getElementById('customerForm').onsubmit = function (e) {
   const name = e.target.name.value.trim();
   const email = e.target.email.value.trim();
   const phone = e.target.phone.value.trim();
-  const serviceProblem = e.target.serviceProblem.value.trim();
+  const service = e.target.service.value.trim();
   const entryDate = e.target.entryDate.value;
   const returnDate = e.target.returnDate.value;
 
@@ -69,7 +69,7 @@ document.getElementById('customerForm').onsubmit = function (e) {
     return;
   }
 
-  if (!name || !email || !phone || !serviceProblem || !entryDate || !returnDate) {
+  if (!name || !email || !phone || !service || !entryDate || !returnDate) {
     alert('Please fill in all fields.');
     return;
   }
@@ -79,7 +79,7 @@ document.getElementById('customerForm').onsubmit = function (e) {
     name,
     email,
     phone,
-    serviceProblem,
+    service,
     entryDate,
     returnDate,
   });
@@ -113,7 +113,7 @@ document.getElementById('customerSearch').addEventListener('input', function () 
         c.name.toLowerCase().includes(term) ||
         c.email.toLowerCase().includes(term) ||
         c.phone.toLowerCase().includes(term) ||
-        c.serviceProblem.toLowerCase().includes(term)
+        c.service.toLowerCase().includes(term)
       );
     });
   }
