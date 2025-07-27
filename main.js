@@ -1,4 +1,4 @@
-// Firebase configuration with your provided API key
+// Your Firebase configuration (replace with your own if needed)
 const firebaseConfig = {
   apiKey: "AIzaSyCguyjHO82e0UXY78da4GLLDMpC2mvYV8Y",
   authDomain: "ibc-entries.firebaseapp.com",
@@ -9,17 +9,17 @@ const firebaseConfig = {
   measurementId: "G-7JDE75ZLND"
 };
 
-// Initialize Firebase
+// Initialize Firebase compat SDK
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Enable offline persistence for better reliability
+// Enable offline data persistence (optional but recommended)
 firebase.firestore().enablePersistence()
   .catch((err) => {
     if (err.code == 'failed-precondition') {
-      console.log('Multiple tabs open, persistence can only be enabled in one tab at a time.');
+      console.warn('Persistence failed due to multiple tabs open');
     } else if (err.code == 'unimplemented') {
-      console.log('The current browser does not support persistence.');
+      console.warn('Browser does not support persistence');
     }
   });
 
@@ -32,76 +32,67 @@ const printBtn = document.getElementById('printBtn');
 let customers = [];
 let filteredCustomers = [];
 
-// Escape HTML to prevent XSS attacks
+// Helper to escape HTML for security
 function escapeHTML(text) {
-  return text.replace(/[&<>"']/g, function(match) {
-    const escapeMap = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    };
-    return escapeMap[match];
-  });
+  return text.replace(/[&<>"']/g, (m) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[m]);
 }
 
-// Update the customer table display
+// Render table rows
 function updateCustomerTable() {
   customerTableBody.innerHTML = '';
-  
   filteredCustomers.forEach(c => {
-    const entryDateFormatted = c.entryDate ? new Date(c.entryDate).toLocaleDateString() : '';
-    const returnDateFormatted = c.returnDate ? new Date(c.returnDate).toLocaleDateString() : '';
-    const emailDisplay = c.email ? escapeHTML(c.email) : "-";
+    const entryDate = c.entryDate ? new Date(c.entryDate).toLocaleDateString() : '';
+    const returnDate = c.returnDate ? new Date(c.returnDate).toLocaleDateString() : '';
+    const email = c.email ? escapeHTML(c.email) : '-';
     
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${escapeHTML(c.name)}</td>
-      <td>${emailDisplay}</td>
+      <td>${email}</td>
       <td>${escapeHTML(c.phone)}</td>
       <td>${escapeHTML(c.service)}</td>
-      <td>${entryDateFormatted}</td>
-      <td>${returnDateFormatted}</td>
-      <td><button class="delete-btn" onclick="deleteCustomerById('${c.id}')" aria-label="Delete Entry">Delete</button></td>
+      <td>${entryDate}</td>
+      <td>${returnDate}</td>
+      <td><button class="delete-btn" onclick="deleteCustomerById('${c.id}')">Delete</button></td>
     `;
     customerTableBody.appendChild(row);
   });
 }
 
-// Load customers from Firestore in real-time
+// Load Firestore data realtime
 function loadCustomersRealtime() {
-  db.collection('customers')
-    .orderBy('entryDate', 'desc')
+  db.collection('customers').orderBy('entryDate', 'desc')
     .onSnapshot(snapshot => {
       customers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       filteredCustomers = [...customers];
       updateCustomerTable();
-      console.log(`Loaded ${customers.length} customer records`);
     }, error => {
-      console.error("Error loading data:", error);
       alert("Error loading data: " + error.message);
+      console.error(error);
     });
 }
 
-// Add new customer/service entry
+// Add form submit handler
 customerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const name = e.target.name.value.trim();
   const email = e.target.email.value.trim();
   const phone = e.target.phone.value.trim();
   const service = e.target.service.value.trim();
   const entryDate = e.target.entryDate.value;
-  const returnDate = e.target.returnDate.value; // optional
+  const returnDate = e.target.returnDate.value;
 
-  // Validate required fields (email and returnDate are optional)
   if (!name || !phone || !service || !entryDate) {
-    alert('Please fill in all required fields (Name, Phone, Service, Entry Date).');
+    alert('Please fill required fields: Name, Phone, Service, Entry Date.');
     return;
   }
 
-  // Validate return date if provided
   if (returnDate) {
     if (new Date(returnDate) < new Date(entryDate)) {
       alert('Return Date cannot be before Entry Date.');
@@ -124,49 +115,40 @@ customerForm.addEventListener('submit', async (e) => {
       returnDate: returnDate || '',
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-    
     e.target.reset();
-    console.log("Customer entry added successfully");
   } catch (err) {
-    console.error("Error saving data:", err);
-    alert("Error saving data: " + err.message);
+    alert("Failed to save entry: " + err.message);
   }
 });
 
-// Delete customer entry by ID
-window.deleteCustomerById = async function (id) {
+// Delete entry handler
+window.deleteCustomerById = async id => {
   if (!confirm('Are you sure you want to delete this entry?')) return;
-  
   try {
     await db.collection('customers').doc(id).delete();
-    console.log("Customer entry deleted successfully");
   } catch (err) {
-    console.error("Error deleting entry:", err);
-    alert("Error deleting entry: " + err.message);
+    alert("Failed to delete entry: " + err.message);
   }
 };
 
-// Search functionality
-customerSearch.addEventListener('input', function () {
+// Search filter input handler
+customerSearch.addEventListener('input', function() {
   const term = this.value.trim().toLowerCase();
   if (!term) {
     filteredCustomers = [...customers];
   } else {
     filteredCustomers = customers.filter(c =>
-      c.name.toLowerCase().includes(term) ||
-      (c.email && c.email.toLowerCase().includes(term)) ||
-      c.phone.toLowerCase().includes(term) ||
-      c.service.toLowerCase().includes(term)
+      c.name.toLowerCase().includes(term)
+      || (c.email && c.email.toLowerCase().includes(term))
+      || c.phone.toLowerCase().includes(term)
+      || c.service.toLowerCase().includes(term)
     );
   }
   updateCustomerTable();
 });
 
-// Print button functionality
-printBtn.addEventListener('click', () => {
-  window.print();
-});
+// Print button handler
+printBtn.addEventListener('click', () => window.print());
 
-// Initialize the application
-console.log("Initializing IBC Service Customer Details...");
+// Start realtime listener
 loadCustomersRealtime();
