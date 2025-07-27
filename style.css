@@ -1,17 +1,17 @@
-body{font-family:Arial,Helvetica,sans-serif;background:#f5f6fa;margin:0;padding:20px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-h1{margin:0;color:#2c3e50}
-.user{display:flex;align-items:center;gap:15px}
-.user button{background:#e74c3c;color:#fff;border:none;padding:6px 14px;border-radius:4px;cursor:pointer}
-section{background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:15px}
-input,button{padding:8px;border:1px solid #ccc;border-radius:4px;font-size:14px}
-button[type="submit"]{background:#27ae60;color:#fff;border:none;grid-column:span 2}
-#search{width:100%;margin:10px 0}
-.btns{display:flex;gap:10px;margin-bottom:10px}
-.btns button{background:#007bff;color:#fff;border:none}
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #ddd;padding:8px;text-align:left}
-th{background:#ecf0f1}
-.del{background:#e74c3c;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer}
+body{font-family:Arial,sans-serif;background:#f5f6fa;margin:0;padding:20px;}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+h1{margin:0;color:#2c3e50;}
+.user{display:flex;align-items:center;gap:15px;}
+.user button{background:#e74c3c;color:#fff;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;}
+section{background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:15px;}
+input,button{padding:8px;font-size:14px;border:1px solid #ccc;border-radius:4px;}
+button[type="submit"]{background:#27ae60;color:#fff;border:none;grid-column:span 2;}
+#search{width:100%;margin:10px 0;}
+.btns{display:flex;gap:10px;margin-bottom:10px;}
+.btns button{background:#007bff;color:#fff;border:none;padding:7px 14px;}
+table{width:100%;border-collapse:collapse;}
+th,td{border:1px solid #ddd;padding:8px;text-align:left;}
+th{background:#ecf0f1;}
+.del{background:#e74c3c;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;}
 @media print{body *{visibility:hidden} table,table *{visibility:visible}}
