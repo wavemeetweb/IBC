@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IBC Service Customer Details</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase SDKs (compat for easy use without bundler) -->
+  <!-- Firebase SDKs (compat version for easy use) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
@@ -18,9 +18,7 @@
     <form id="customerForm">
       <input id="name" placeholder="Name" required />
       <input id="email" placeholder="Email (optional)" type="email" />
-      <input id="phone" placeholder="Phone" required />
-
-      <input id="service" placeholder="Service" required />
+      <input id="phone" placeholder="Phone" id="service" placeholder="Service" required />
 
       <label for="entryDate">Entry Date:</label>
       <input id="entryDate" type="date" required />
