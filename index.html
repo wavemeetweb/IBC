@@ -1,18 +1,64 @@
-<!-- In the Add Customer section, add a purchase/registration date input -->
-<form id="customerForm">
-  <input id="name" placeholder="Name" required>
-  <input id="email" placeholder="Email" required>
-  <input id="phone" placeholder="Phone" required>
-  <label for="purchaseDate">Purchase Date:</label>
-  <input id="purchaseDate" type="date" required>
-  <button type="submit">Add Customer</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Customer & Work Management</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Customer & Work Management</h1>
 
-<!-- In the Add Work section, add a Delivery Date input -->
-<form id="workForm">
-  <input id="workTitle" placeholder="Work Title" required>
-  <select id="workCustomer" required></select>
-  <label for="deliveryDate">Delivery Date:</label>
-  <input id="deliveryDate" type="date" required>
-  <button type="submit">Add Work</button>
-</form>
+  <section>
+    <h2>Add Customer</h2>
+    <form id="customerForm">
+      <input id="name" placeholder="Name" required />
+      <input id="email" placeholder="Email" required type="email" />
+      <input id="phone" placeholder="Phone" required />
+      <label for="purchaseDate">Purchase Date:</label>
+      <input id="purchaseDate" type="date" required />
+      <button type="submit">Add Customer</button>
+    </form>
+
+    <h3>Customers</h3>
+    <table id="customerTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Purchase Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Add Work</h2>
+    <form id="workForm">
+      <input id="workTitle" placeholder="Work Title" required />
+      <select id="workCustomer" required></select>
+      <label for="deliveryDate">Delivery Date:</label>
+      <input id="deliveryDate" type="date" required />
+      <button type="submit">Add Work</button>
+    </form>
+
+    <h3>Work List</h3>
+    <table id="workTable">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Customer</th>
+          <th>Delivery Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <script src="main.js"></script>
+</body>
+</html>
