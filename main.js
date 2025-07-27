@@ -163,21 +163,6 @@ document.getElementById('printBtn').addEventListener('click', () => {
   window.print();
 });
 
-// Test Firebase connection
-function testFirebaseConnection() {
-  db.collection("test").add({
-    message: "Connection test",
-    timestamp: new Date()
-  }).then(() => {
-    console.log("SUCCESS: Firebase connection working!");
-  }).catch((error) => {
-    console.error("ERROR: Firebase connection failed:", error);
-  });
-}
-
 // Initialize the app
 console.log("Initializing IBC Service Customer Details...");
 loadCustomersRealtime();
-
-// Optional: Test connection on startup
-// testFirebaseConnection();
