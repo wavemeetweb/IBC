@@ -6,7 +6,7 @@
   <title>IBC Service Customer Details</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase SDKs (compat version for easy use) -->
+  <!-- Firebase SDKs (compat version for easy use without bundler) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
@@ -30,15 +30,12 @@
       <button type="submit">Add Entry</button>
     </form>
 
-    <label for="customercustomerSearch"
-      type="text"
-      placeholder="Search by name, email, phone, or service..."
-    />
+    <label for="customerSearch">Search Customers:</label>
+    <input id="customerSearch" type="text" placeholder="Search by name, email, phone, or service..." />
 
     <button id="printBtn">Print Customer & Service List</button>
 
-    <h3>Customer & Service List</h3>
-    <table id="customerTable">
+    <h<table id="customerTable">
       <thead>
         <tr>
           <th>Name</th>
