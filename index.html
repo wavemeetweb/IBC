@@ -6,12 +6,24 @@
   <title>IBC Service Customer Details</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase Compatibility SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <!-- Supabase JavaScript Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <h1>IBC Service Customer Details</h1>
+  <!-- Login Check Script - Must be first -->
+  <script>
+    if (sessionStorage.getItem('loggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+
+  <header>
+    <h1>🔧 IBC Service Customer Details</h1>
+    <div class="user-info">
+      <span>Welcome, <strong id="username-display"></strong></span>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+  </header>
 
   <section>
     <h2>Add Customer & Service</h2>
@@ -30,26 +42,33 @@
       <button type="submit">Add Entry</button>
     </form>
 
-    <label for="customerSearch">Search Customers:</label>
-    <input id="customerSearch" type="text" placeholder="Search by name, email, phone, or service..." />
+    <div class="search-container">
+      <label for="customerSearch">🔍 Search Customers:</label>
+      <input id="customerSearch" type="text" placeholder="Search by name, email, phone, or service..." />
+    </div>
 
-    <button id="printBtn">Print Customer & Service List</button>
+    <div class="action-buttons">
+      <button id="printBtn">🖨️ Print Customer List</button>
+      <button id="refreshBtn">🔄 Refresh Data</button>
+    </div>
 
-    <h3>Customer & Service List</h3>
-    <table id="customerTable">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Service</th>
-          <th>Entry Date</th>
-          <th>Return Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <h3>Customer & Service List (<span id="recordCount">0</span> records)</h3>
+    <div class="table-container">
+      <table id="customerTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Service</th>
+            <th>Entry Date</th>
+            <th>Return Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </section>
 
   <script src="main.js"></script>
