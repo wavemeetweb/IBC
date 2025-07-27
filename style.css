@@ -45,7 +45,7 @@ input[type="date"] {
   flex-grow: 1;
 }
 
-input#serviceProblem {
+input#service {
   min-width: 250px;
   flex-grow: 1;
 }
