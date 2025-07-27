@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,54 +10,39 @@
   <h1>IBC Service Customer Details</h1>
 
   <section>
-    <h2>Add Customer</h2>
+    <h2>Add Customer & Service</h2>
     <form id="customerForm">
       <input id="name" placeholder="Name" required />
       <input id="email" placeholder="Email" required type="email" />
       <input id="phone" placeholder="Phone" required />
       <label for="purchaseDate">Purchase Date:</label>
       <input id="purchaseDate" type="date" required />
-      <button type="submit">Add Customer</button>
+
+      <input id="serviceProblem" placeholder="Service Problem" required />
+
+      <label for="entryDate">Entry Date:</label>
+      <input id="entryDate" type="date" required />
+
+      <label for="returnDate">Return Date:</label>
+      <input id="returnDate" type="date" required />
+
+      <button type="submit">Add Entry</button>
     </form>
 
     <label for="customerSearch">Search Customers:</label>
-    <input id="customerSearch" type="text" placeholder="Search by name, email, phone..." />
+    <input id="customerSearch" type="text" placeholder="Search by name, email, phone, or service problem..." />
 
-    <h3>Customers</h3>
+    <h3>Customer & Service List</h3>
     <table id="customerTable">
       <thead>
         <tr>
           <th>Name</th>
           <th>Email</th>
           <th>Phone</th>
+          <th>Purchase Date</th>
+          <th>Service Problem</th>
           <th>Entry Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </section>
-
-  <section>
-    <h2>Add Work</h2>
-    <form id="workForm">
-      <input id="workTitle" placeholder="Work Title" required />
-      <select id="workCustomer" required></select>
-      <label for="deliveryDate">Delivery Date:</label>
-      <input id="deliveryDate" type="date" required />
-      <button type="submit">Add Work</button>
-    </form>
-
-    <label for="workSearch">Search Work:</label>
-    <input id="workSearch" type="text" placeholder="Search by title or customer name..." />
-
-    <h3>Work List</h3>
-    <table id="workTable">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Customer</th>
-          <th>Delivery Date</th>
+          <th>Return Date</th>
           <th>Actions</th>
         </tr>
       </thead>
