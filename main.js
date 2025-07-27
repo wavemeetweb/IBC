@@ -1,4 +1,4 @@
-// Initialize Firebase with your configuration
+// Firebase configuration with your provided API key
 const firebaseConfig = {
   apiKey: "AIzaSyCguyjHO82e0UXY78da4GLLDMpC2mvYV8Y",
   authDomain: "ibc-entries.firebaseapp.com",
@@ -23,29 +23,33 @@ firebase.firestore().enablePersistence()
     }
   });
 
-// Elements
+// DOM elements
+const customerForm = document.getElementById('customerForm');
 const customerTableBody = document.querySelector('#customerTable tbody');
+const customerSearch = document.getElementById('customerSearch');
+const printBtn = document.getElementById('printBtn');
 
 let customers = [];
 let filteredCustomers = [];
 
-// Escape HTML string for safety
+// Escape HTML to prevent XSS attacks
 function escapeHTML(text) {
-  return text.replace(/[&<>"']/g, (match) => {
-    const escapes = {
+  return text.replace(/[&<>"']/g, function(match) {
+    const escapeMap = {
       '&': '&amp;',
       '<': '&lt;',
       '>': '&gt;',
       '"': '&quot;',
-      '\'': '&#39;'
+      "'": '&#39;'
     };
-    return escapes[match];
+    return escapeMap[match];
   });
 }
 
-// Render customers table from filteredCustomers array
+// Update the customer table display
 function updateCustomerTable() {
   customerTableBody.innerHTML = '';
+  
   filteredCustomers.forEach(c => {
     const entryDateFormatted = c.entryDate ? new Date(c.entryDate).toLocaleDateString() : '';
     const returnDateFormatted = c.returnDate ? new Date(c.returnDate).toLocaleDateString() : '';
@@ -65,7 +69,7 @@ function updateCustomerTable() {
   });
 }
 
-// Load data from Firestore in real-time
+// Load customers from Firestore in real-time
 function loadCustomersRealtime() {
   db.collection('customers')
     .orderBy('entryDate', 'desc')
@@ -81,7 +85,7 @@ function loadCustomersRealtime() {
 }
 
 // Add new customer/service entry
-document.getElementById('customerForm').addEventListener('submit', async (e) => {
+customerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const name = e.target.name.value.trim();
@@ -97,7 +101,7 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
     return;
   }
 
-  // Validate returnDate only if entered
+  // Validate return date if provided
   if (returnDate) {
     if (new Date(returnDate) < new Date(entryDate)) {
       alert('Return Date cannot be before Entry Date.');
@@ -129,7 +133,7 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
   }
 });
 
-// Delete a customer entry by Firestore doc ID
+// Delete customer entry by ID
 window.deleteCustomerById = async function (id) {
   if (!confirm('Are you sure you want to delete this entry?')) return;
   
@@ -142,8 +146,8 @@ window.deleteCustomerById = async function (id) {
   }
 };
 
-// Search customers live
-document.getElementById('customerSearch').addEventListener('input', function () {
+// Search functionality
+customerSearch.addEventListener('input', function () {
   const term = this.value.trim().toLowerCase();
   if (!term) {
     filteredCustomers = [...customers];
@@ -158,11 +162,11 @@ document.getElementById('customerSearch').addEventListener('input', function () 
   updateCustomerTable();
 });
 
-// Print button event
-document.getElementById('printBtn').addEventListener('click', () => {
+// Print button functionality
+printBtn.addEventListener('click', () => {
   window.print();
 });
 
-// Initialize the app
+// Initialize the application
 console.log("Initializing IBC Service Customer Details...");
 loadCustomersRealtime();
