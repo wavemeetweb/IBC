@@ -6,7 +6,7 @@
   <title>IBC Service Customer Details</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase SDKs (compat version for easy use without bundler) -->
+  <!-- Firebase Compatibility SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
@@ -24,7 +24,7 @@
       <label for="entryDate">Entry Date:</label>
       <input id="entryDate" type="date" required />
 
-      <label for="returnDate">Return Date:</label>
+      <label for="returnDate">Return Date (optional):</label>
       <input id="returnDate" type="date" />
 
       <button type="submit">Add Entry</button>
@@ -35,7 +35,8 @@
 
     <button id="printBtn">Print Customer & Service List</button>
 
-    <h<table id="customerTable">
+    <h3>Customer & Service List</h3>
+    <table id="customerTable">
       <thead>
         <tr>
           <th>Name</th>
