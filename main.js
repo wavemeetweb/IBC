@@ -29,7 +29,6 @@ function updateCustomerTable() {
   tbody.innerHTML = '';
 
   filteredCustomers.forEach((c) => {
-    const purchaseDateFormatted = c.purchaseDate ? new Date(c.purchaseDate).toLocaleDateString() : '';
     const entryDateFormatted = c.entryDate ? new Date(c.entryDate).toLocaleDateString() : '';
     const returnDateFormatted = c.returnDate ? new Date(c.returnDate).toLocaleDateString() : '';
 
@@ -38,7 +37,6 @@ function updateCustomerTable() {
       <td>${escapeHTML(c.name)}</td>
       <td>${escapeHTML(c.email)}</td>
       <td>${escapeHTML(c.phone)}</td>
-      <td>${purchaseDateFormatted}</td>
       <td>${escapeHTML(c.serviceProblem)}</td>
       <td>${entryDateFormatted}</td>
       <td>${returnDateFormatted}</td>
@@ -55,7 +53,6 @@ document.getElementById('customerForm').onsubmit = function (e) {
   const name = e.target.name.value.trim();
   const email = e.target.email.value.trim();
   const phone = e.target.phone.value.trim();
-  const purchaseDate = e.target.purchaseDate.value; // yyyy-mm-dd
   const serviceProblem = e.target.serviceProblem.value.trim();
   const entryDate = e.target.entryDate.value;
   const returnDate = e.target.returnDate.value;
@@ -72,7 +69,7 @@ document.getElementById('customerForm').onsubmit = function (e) {
     return;
   }
 
-  if (!name || !email || !phone || !purchaseDate || !serviceProblem || !entryDate || !returnDate) {
+  if (!name || !email || !phone || !serviceProblem || !entryDate || !returnDate) {
     alert('Please fill in all fields.');
     return;
   }
@@ -82,7 +79,6 @@ document.getElementById('customerForm').onsubmit = function (e) {
     name,
     email,
     phone,
-    purchaseDate,
     serviceProblem,
     entryDate,
     returnDate,
@@ -123,6 +119,11 @@ document.getElementById('customerSearch').addEventListener('input', function () 
   }
 
   updateCustomerTable();
+});
+
+// Print Button event
+document.getElementById('printBtn').addEventListener('click', () => {
+  window.print();
 });
 
 // Initial render
