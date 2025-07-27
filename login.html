@@ -28,14 +28,14 @@
       font-size: 24px;
     }
     input[type="text"],
-    input[type="password"] {
-      width: 100%;
+    inputwidth: 100%;
       padding: 12px;
       margin: 10px 0;
       box-sizing: border-box;
       border-radius: 6px;
       border: 2px solid #ddd;
-      font-size: 16px;3s;
+      font-size: 16px;
+      transition: border-color 0.3s;
     }
     input[type="text"]:focus,
     input[type="password"]:focus {
@@ -63,11 +63,27 @@
       display: none;
       font-weight: bold;
     }
+    .success {
+      color: #27ae60;
+      margin: 15px 0;
+      display: none;
+      font-weight: bold;
+    }
     .logo {
       font-size: 20px;
       font-weight: bold;
       color: #3498db;
       margin-bottom: 20px;
+    }
+    .debug-info {
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 20px;
+      font-size: 12px;
+      text-align: left;
+      display: none;
     }
   </style>
 </head>
@@ -75,39 +91,115 @@
   <div class="login-container">
     <div class="logo">🔧 IBC Service</div>
     <h2>Login to Continue</h2>
+    
     <div id="error-msg" class="error">Invalid username or password!</div>
+    <div id="success-msg" class="success">Login successful! Redirecting...</div>
+    
     <form id="loginForm">
       <input type="text" id="username" placeholder="Username" required autofocus />
       <input type="password" id="password" placeholder="Password" required />
       <button type="submit">Login</button>
     </form>
+
+    <!-- Debug information (remove in production) -->
+    <div id="debug-info" class="debug-info">
+      <strong>Debug Info:</strong><br>
+      Expected Username: durga_mahapatra<br>
+      Expected Password: happy@12390<br>
+      <div id="debug-details"></div>
+    </div>
+    
+    <!-- Show debug toggle -->
+    <button type="button" id="debug-toggle" style="margin-top: 10px; font-size: 12px; padding: 5px;">Show Debug Info</button>
   </div>
 
   <script>
     const loginForm = document.getElementById('loginForm');
     const errorMsg = document.getElementById('error-msg');
+    const successMsg = document.getElementById('success-msg');
+    const debugInfo = document.getElementById('debug-info');
+    const debugDetails = document.getElementById('debug-details');
+    const debugToggle = document.getElementById('debug-toggle');
+
+    // Debug toggle functionality
+    debugToggle.addEventListener('click', function() {
+      if (debugInfo.style.display === 'none' || debugInfo.style.display === '') {
+        debugInfo.style.display = 'block';
+        debugToggle.textContent = 'Hide Debug Info';
+      } else {
+        debugInfo.style.display = 'none';
+        debugToggle.textContent = 'Show Debug Info';
+      }
+    });
+
+    // Correct credentials
+    const CORRECT_USERNAME = 'durga_mahapatra';
+    const CORRECT_PASSWORD = 'happy@12390';
 
     loginForm.addEventListener('submit', function(e) {
       e.preventDefault();
 
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
+      // Hide previous messages
+      errorMsg.style.display = 'none';
+      successMsg.style.display = 'none';
 
-      if (username === 'durga_mahapatra' && password === 'happy@12390') {
+      // Get form values
+      const enteredUsername = document.getElementById('username').value;
+      const enteredPassword = document.getElementById('password').value;
+      
+      // Remove any extra whitespace
+      const cleanUsername = enteredUsername.trim();
+      const cleanPassword = enteredPassword;
+
+      // Debug information
+      debugDetails.innerHTML = `
+        Entered Username: "${enteredUsername}" (length: ${enteredUsername.length})<br>
+        Cleaned Username: "${cleanUsername}" (length: ${cleanUsername.length})<br>
+        Username Match: ${cleanUsername === CORRECT_USERNAME ? '✅ YES' : '❌ NO'}<br>
+        <br>
+        Entered Password: "${enteredPassword}" (length: ${enteredPassword.length})<br>
+        Password Match: ${enteredPassword === CORRECT_PASSWORD ? '✅ YES' : '❌ NO'}<br>
+      `;
+
+      console.log('Login attempt:', {
+        enteredUsername: enteredUsername,
+        cleanUsername: cleanUsername,
+        enteredPassword: enteredPassword,
+        usernameMatch: cleanUsername === CORRECT_USERNAME,
+        passwordMatch: enteredPassword === CORRECT_PASSWORD
+      });
+
+      // Check credentials
+      if (cleanUsername === CORRECT_USERNAME && enteredPassword === CORRECT_PASSWORD) {
+        // Success!
+        successMsg.style.display = 'block';
+        
         // Set login status
         sessionStorage.setItem('loggedIn', 'true');
-        sessionStorage.setItem('username', username);
+        sessionStorage.setItem('username', cleanUsername);
         
-        // Redirect to main app
-        window.location.href = 'index.html';
+        console.log('Login successful! Redirecting to index.html');
+        
+        // Redirect after a brief delay to show success message
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1000);
+        
       } else {
+        // Failed login
         errorMsg.style.display = 'block';
+        console.log('Login failed');
+        
         // Hide error after 3 seconds
         setTimeout(() => {
           errorMsg.style.display = 'none';
         }, 3000);
       }
     });
+
+    // Pre-fill for testing (remove in production)
+    document.getElementById('username').value = 'durga_mahapatra';
+    document.getElementById('password').value = 'happy@12390';
   </script>
 </body>
 </html>
