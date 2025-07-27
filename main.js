@@ -1,4 +1,4 @@
-// Initialize Firebase (using compat SDK from included scripts)
+// Initialize Firebase with your configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCguyjHO82e0UXY78da4GLLDMpC2mvYV8Y",
   authDomain: "ibc-entries.firebaseapp.com",
@@ -9,8 +9,19 @@ const firebaseConfig = {
   measurementId: "G-7JDE75ZLND"
 };
 
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// Enable offline persistence for better reliability
+firebase.firestore().enablePersistence()
+  .catch((err) => {
+    if (err.code == 'failed-precondition') {
+      console.log('Multiple tabs open, persistence can only be enabled in one tab at a time.');
+    } else if (err.code == 'unimplemented') {
+      console.log('The current browser does not support persistence.');
+    }
+  });
 
 // Elements
 const customerTableBody = document.querySelector('#customerTable tbody');
@@ -39,6 +50,7 @@ function updateCustomerTable() {
     const entryDateFormatted = c.entryDate ? new Date(c.entryDate).toLocaleDateString() : '';
     const returnDateFormatted = c.returnDate ? new Date(c.returnDate).toLocaleDateString() : '';
     const emailDisplay = c.email ? escapeHTML(c.email) : "-";
+    
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${escapeHTML(c.name)}</td>
@@ -61,7 +73,9 @@ function loadCustomersRealtime() {
       customers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       filteredCustomers = [...customers];
       updateCustomerTable();
+      console.log(`Loaded ${customers.length} customer records`);
     }, error => {
+      console.error("Error loading data:", error);
       alert("Error loading data: " + error.message);
     });
 }
@@ -77,7 +91,7 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
   const entryDate = e.target.entryDate.value;
   const returnDate = e.target.returnDate.value; // optional
 
-  // Validate required fields except email and returnDate
+  // Validate required fields (email and returnDate are optional)
   if (!name || !phone || !service || !entryDate) {
     alert('Please fill in all required fields (Name, Phone, Service, Entry Date).');
     return;
@@ -103,10 +117,14 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
       phone,
       service,
       entryDate,
-      returnDate: returnDate || ''
+      returnDate: returnDate || '',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
+    
     e.target.reset();
+    console.log("Customer entry added successfully");
   } catch (err) {
+    console.error("Error saving data:", err);
     alert("Error saving data: " + err.message);
   }
 });
@@ -114,9 +132,12 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
 // Delete a customer entry by Firestore doc ID
 window.deleteCustomerById = async function (id) {
   if (!confirm('Are you sure you want to delete this entry?')) return;
+  
   try {
     await db.collection('customers').doc(id).delete();
+    console.log("Customer entry deleted successfully");
   } catch (err) {
+    console.error("Error deleting entry:", err);
     alert("Error deleting entry: " + err.message);
   }
 };
@@ -142,5 +163,21 @@ document.getElementById('printBtn').addEventListener('click', () => {
   window.print();
 });
 
-// Start real-time loading
+// Test Firebase connection
+function testFirebaseConnection() {
+  db.collection("test").add({
+    message: "Connection test",
+    timestamp: new Date()
+  }).then(() => {
+    console.log("SUCCESS: Firebase connection working!");
+  }).catch((error) => {
+    console.error("ERROR: Firebase connection failed:", error);
+  });
+}
+
+// Initialize the app
+console.log("Initializing IBC Service Customer Details...");
 loadCustomersRealtime();
+
+// Optional: Test connection on startup
+// testFirebaseConnection();
