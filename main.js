@@ -1,18 +1,15 @@
-// Load customers and workList from localStorage or start empty
+// Load data from localStorage or start with empty array
 let customers = JSON.parse(localStorage.getItem('customers') || '[]');
-let workList = JSON.parse(localStorage.getItem('workList') || '[]');
 
-// Variables to store filtered lists
+// Filtered customers array for search functionality
 let filteredCustomers = [...customers];
-let filteredWorkList = [...workList];
 
-// Save data back to localStorage
+// Save customers to localStorage
 function saveData() {
   localStorage.setItem('customers', JSON.stringify(customers));
-  localStorage.setItem('workList', JSON.stringify(workList));
 }
 
-// Escape HTML to avoid XSS for displayed text
+// Escape HTML to prevent XSS attacks for display
 function escapeHTML(text) {
   return text.replace(/[&<>"']/g, function (match) {
     const escape = {
@@ -26,66 +23,32 @@ function escapeHTML(text) {
   });
 }
 
-// Render Customers Table
+// Update customers table display
 function updateCustomerTable() {
   const tbody = document.querySelector('#customerTable tbody');
   tbody.innerHTML = '';
 
-  filteredCustomers.forEach((c, i) => {
-    const purchaseDateFormatted = c.purchaseDate
-      ? new Date(c.purchaseDate).toLocaleDateString()
-      : '';
+  filteredCustomers.forEach((c) => {
+    const purchaseDateFormatted = c.purchaseDate ? new Date(c.purchaseDate).toLocaleDateString() : '';
+    const entryDateFormatted = c.entryDate ? new Date(c.entryDate).toLocaleDateString() : '';
+    const returnDateFormatted = c.returnDate ? new Date(c.returnDate).toLocaleDateString() : '';
+
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${escapeHTML(c.name)}</td>
       <td>${escapeHTML(c.email)}</td>
       <td>${escapeHTML(c.phone)}</td>
       <td>${purchaseDateFormatted}</td>
-      <td>
-        <button class="delete-btn" onclick="deleteCustomerById(${c.id})" aria-label="Delete Customer">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-  updateCustomerOptions();
-}
-
-// Render Work Table
-function updateWorkTable() {
-  const tbody = document.querySelector('#workTable tbody');
-  tbody.innerHTML = '';
-
-  filteredWorkList.forEach((w, i) => {
-    const customer = customers.find(c => c.id === w.customerId);
-    const deliveryDateFormatted = w.deliveryDate
-      ? new Date(w.deliveryDate).toLocaleDateString()
-      : '';
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${escapeHTML(w.title)}</td>
-      <td>${customer ? escapeHTML(customer.name) : 'Unknown'}</td>
-      <td>${deliveryDateFormatted}</td>
-      <td>
-        <button class="delete-btn" onclick="deleteWorkByIndex(${w.id})" aria-label="Delete Work">Delete</button>
-      </td>
+      <td>${escapeHTML(c.serviceProblem)}</td>
+      <td>${entryDateFormatted}</td>
+      <td>${returnDateFormatted}</td>
+      <td><button class="delete-btn" onclick="deleteCustomerById(${c.id})" aria-label="Delete Entry">Delete</button></td>
     `;
     tbody.appendChild(row);
   });
 }
 
-// Populate Customer dropdown in work form
-function updateCustomerOptions() {
-  const select = document.getElementById('workCustomer');
-  if (customers.length === 0) {
-    select.innerHTML = '<option value="">No customers available</option>';
-  } else {
-    select.innerHTML = customers
-      .map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`)
-      .join('');
-  }
-}
-
-// Add Customer handler
+// Add new customer/service entry
 document.getElementById('customerForm').onsubmit = function (e) {
   e.preventDefault();
 
@@ -93,90 +56,56 @@ document.getElementById('customerForm').onsubmit = function (e) {
   const email = e.target.email.value.trim();
   const phone = e.target.phone.value.trim();
   const purchaseDate = e.target.purchaseDate.value; // yyyy-mm-dd
+  const serviceProblem = e.target.serviceProblem.value.trim();
+  const entryDate = e.target.entryDate.value;
+  const returnDate = e.target.returnDate.value;
 
-  if (!name || !email || !phone || !purchaseDate) {
-    alert('Please fill in all customer fields.');
+  // Validation: ensure return date is not before entry date and not too far apart (<=30 days)
+  if (new Date(returnDate) < new Date(entryDate)) {
+    alert('Return Date cannot be before Entry Date.');
+    return;
+  }
+  const msInDay = 1000 * 60 * 60 * 24;
+  const diffDays = (new Date(returnDate) - new Date(entryDate)) / msInDay;
+  if (diffDays > 30) {
+    alert('Return Date should be within 30 days of Entry Date.');
     return;
   }
 
-  const newCustomer = {
+  if (!name || !email || !phone || !purchaseDate || !serviceProblem || !entryDate || !returnDate) {
+    alert('Please fill in all fields.');
+    return;
+  }
+
+  customers.push({
     id: Date.now(),
     name,
     email,
     phone,
     purchaseDate,
-  };
-
-  customers.push(newCustomer);
-  filteredCustomers = [...customers];
-
-  saveData();
-  updateCustomerTable();
-  this.reset();
-  updateCustomerOptions();
-};
-
-// Add Work handler
-document.getElementById('workForm').onsubmit = function (e) {
-  e.preventDefault();
-
-  const title = e.target.workTitle.value.trim();
-  const customerId = Number(e.target.workCustomer.value);
-  const deliveryDate = e.target.deliveryDate.value; // yyyy-mm-dd
-
-  if (!title || !customerId || !deliveryDate) {
-    alert('Please fill in all work fields.');
-    return;
-  }
-
-  const newWork = {
-    id: Date.now(),
-    title,
-    customerId,
-    deliveryDate,
-  };
-
-  workList.push(newWork);
-  filteredWorkList = [...workList];
-
-  saveData();
-  updateWorkTable();
-  this.reset();
-};
-
-// Delete Customer by ID and associated Work
-window.deleteCustomerById = function (customerId) {
-  if (!confirm('Are you sure you want to delete this customer? All related work will also be deleted.')) {
-    return;
-  }
-
-  customers = customers.filter(c => c.id !== customerId);
-  workList = workList.filter(w => w.customerId !== customerId);
+    serviceProblem,
+    entryDate,
+    returnDate,
+  });
 
   filteredCustomers = [...customers];
-  filteredWorkList = [...workList];
-
   saveData();
   updateCustomerTable();
-  updateWorkTable();
+  e.target.reset();
 };
 
-// Delete Work by its ID
-window.deleteWorkByIndex = function (workId) {
-  if (!confirm('Are you sure you want to delete this work item?')) {
+// Delete customer/service entry by ID
+window.deleteCustomerById = function (id) {
+  if (!confirm('Are you sure you want to delete this entry?')) {
     return;
   }
-
-  workList = workList.filter(w => w.id !== workId);
-  filteredWorkList = [...workList];
-
+  customers = customers.filter(c => c.id !== id);
+  filteredCustomers = [...customers];
   saveData();
-  updateWorkTable();
+  updateCustomerTable();
 };
 
-// --- SEARCH FUNCTIONALITY ---
-
-// Customer Search Input
+// Search functionality on customerSearch input
 document.getElementById('customerSearch').addEventListener('input', function () {
   const term = this.value.trim().toLowerCase();
 
@@ -187,7 +116,8 @@ document.getElementById('customerSearch').addEventListener('input', function () 
       return (
         c.name.toLowerCase().includes(term) ||
         c.email.toLowerCase().includes(term) ||
-        c.phone.toLowerCase().includes(term)
+        c.phone.toLowerCase().includes(term) ||
+        c.serviceProblem.toLowerCase().includes(term)
       );
     });
   }
@@ -195,28 +125,6 @@ document.getElementById('customerSearch').addEventListener('input', function () 
   updateCustomerTable();
 });
 
-// Work Search Input
-document.getElementById('workSearch').addEventListener('input', function () {
-  const term = this.value.trim().toLowerCase();
-
-  if (!term) {
-    filteredWorkList = [...workList];
-  } else {
-    filteredWorkList = workList.filter(w => {
-      const customer = customers.find(c => c.id === w.customerId);
-      return (
-        w.title.toLowerCase().includes(term) ||
-        (customer && customer.name.toLowerCase().includes(term))
-      );
-    });
-  }
-
-  updateWorkTable();
-});
-
-// Initial render of tables and dropdowns
+// Initial render
 filteredCustomers = [...customers];
-filteredWorkList = [...workList];
 updateCustomerTable();
-updateWorkTable();
-updateCustomerOptions();
