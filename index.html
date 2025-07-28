@@ -1,51 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Customer Details</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IBC Service Dashboard</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <script>
     if (sessionStorage.getItem('loggedIn') !== 'true') {
-      location.href = 'login.html';
+      window.location.href = 'login.html';
     }
   </script>
 
-  <header>
-    <h1>IBC Service Customer Details</h1>
-    <div>
-      <span id="userDisplay"></span>
-      <button id="logoutBtn">Logout</button>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="logo">🔧</span>
+      <span class="brand-text">IBC Service</span>
     </div>
-  </header>
+    <div class="nav-user">
+      <span class="welcome">Welcome, <strong id="username"></strong></span>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+  </nav>
 
-  <section>
-    <form id="customerForm">
-      <input id="name" placeholder="Name" required />
-      <input id="email" placeholder="Email (optional)" type="email" />
-      <input id="phone" placeholder="Phone" required />
-      <input id="service" placeholder="Service" required />
-      <input id="entryDate" type="date" required />
-      <input id="returnDate" type="date" />
-      <button type="submit">Add Entry</button>
-    </form>
+  <div class="container">
+    <!-- Add Customer Form Card -->
+    <div class="card form-card">
+      <div class="card-header">
+        <h2>➕ Add New Customer</h2>
+      </div>
+      <div class="card-body">
+        <form id="customerForm" class="customer-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Customer Name *</label>
+              <input id="name" type="text" placeholder="Enter customer name" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number *</label>
+              <input id="phone" type="tel" placeholder="Enter phone number" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input id="email" type="email" placeholder="Enter email (optional)">
+            </div>
+            <div class="form-group">
+              <label for="service">Service Type *</label>
+              <input id="service" type="text" placeholder="Enter service type" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="entryDate">Entry Date *</label>
+              <input id="entryDate" type="date" required>
+            </div>
+            <div class="form-group">
+              <label for="returnDate">Return Date</label>
+              <input id="returnDate" type="date">
+            </div>
+          </div>
+          
+          <button type="submit" class="submit-btn">
+            <span class="btn-text">Add Customer</span>
+            <span class="btn-loading" style="display: none;">Adding...</span>
+          </button>
+        </form>
+      </div>
+    </div>
 
-    <input id="search" placeholder="Search…" />
+    <!-- Search & Actions Card -->
+    <div class="card">
+      <div class="card-body">
+        <div class="search-actions">
+          <div class="search-group">
+            <input id="searchInput" type="text" placeholder="🔍 Search customers..." class="search-input">
+          </div>
+          <div class="action-buttons">
+            <button id="refreshBtn" class="action-btn refresh-btn">🔄 Refresh</button>
+            <button id="printBtn" class="action-btn print-btn">🖨️ Print List</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <button id="refreshBtn">Refresh</button>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th><th>Email</th><th>Phone</th><th>Service</th>
-          <th>Entry Date</th><th>Return Date</th><th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </section>
+    <!-- Customer List Card -->
+    <div class="card table-card">
+      <div class="card-header">
+        <h2>Customer List (<span id="recordCount">0</span> Records)</h2>
+      </div>
+      <div class="card-body">
+        <div class="table-container">
+          <table id="customerTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Service</th>
+                <th>Entry Date</th>
+                <th>Return Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="main.js"></script>
 </body>
