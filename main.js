@@ -1,21 +1,18 @@
-// --- CONFIG ---
-// Replace key with your actual anon public API key from Supabase dashboard if needed
-const SUPABASE_URL = 'https://euvrtzphbzewxfdfdwkt.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1dnJ0enBoYnpld3hmZGZkd2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2MDA5MjgsImV4cCI6MjA2OTE3NjkyOH0.nHNZV8bgzXROLvAaAFhXtIZH44-161XG6t28G342XZk';
+// Supabase config. Use *your* project URL and anon key.
+const SUPABASE_URL = 'https://tobukpkjtgwjemoxghry.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvYnVrcGtqdGd3amVtb3hnaHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MDIwOTgsImV4cCI6MjA2OTI3ODA5OH0.pA_gRllWJBBceEIFurMEE8ectLuu2fHwvElZhsst1jY';
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// --- DOM ---
 document.getElementById('who').textContent = sessionStorage.getItem('username')||'User';
 document.getElementById('logoutBtn').onclick = ()=>{
   sessionStorage.clear(); location.href = 'login.html';
 };
 document.getElementById('printBtn').onclick = ()=>window.print();
 
-// --- State ---
 let customers = [], filtered = [];
 
-// --- Helpers ---
 function escapeHTML(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
 function render(){
   const tbody = document.querySelector('#customerTable tbody');
   tbody.innerHTML = '';
@@ -23,7 +20,7 @@ function render(){
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${escapeHTML(r.name)}</td>
-      <td>${r.email?escapeHTML(r.email):'-'}</td>
+      <td>${r.email ? escapeHTML(r.email): '-'}</td>
       <td>${escapeHTML(r.phone)}</td>
       <td>${escapeHTML(r.service)}</td>
       <td>${r.entry_date||''}</td>
@@ -40,12 +37,11 @@ window.delCustomer = async function(id){
 };
 
 async function loadCustomers(){
-  const {data,error} = await supabase.from('customers').select('*').order('entry_date',{ascending:false});
+  const {data,error} = await supabase.from('customers').select('*').order('entry_date', {ascending:false});
   if(error){alert('Load error: '+error.message);return;}
   customers = data||[]; filtered = [...customers]; render();
 }
 
-// --- Add entry ---
 document.getElementById('custForm').onsubmit = async e=>{
   e.preventDefault();
   const f = e.target;
@@ -61,23 +57,19 @@ document.getElementById('custForm').onsubmit = async e=>{
     return;
   }
 
-  // (Debug, optional) console.log({name,email,phone,service,entry_date,return_date});
-
   const { error } = await supabase.from('customers').insert([
-    { name, email: email || null, phone, service, entry_date, return_date }
+    { name, email: email||null, phone, service, entry_date, return_date }
   ]);
   if(error){
     alert('Error saving data: ' + error.message);
     return;
   }
-  f.reset();
-  loadCustomers();
+  f.reset(); loadCustomers();
 };
 
-// --- Search ---
 document.getElementById('search').oninput = e=>{
   const q = e.target.value.toLowerCase();
-  filtered = q?
+  filtered = q ?
     customers.filter(r =>
       r.name.toLowerCase().includes(q) ||
       (r.email && r.email.toLowerCase().includes(q)) ||
@@ -86,9 +78,5 @@ document.getElementById('search').oninput = e=>{
     ) : [...customers];
   render();
 };
-
-// --- Manual refresh button ---
 document.getElementById('refreshBtn').onclick = loadCustomers;
-
-// --- Initial Load ---
 window.onload = loadCustomers;
