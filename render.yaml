@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: ibc-customers-service-list
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ibc-customers-db
+          property: connectionString
+
+databases:
+  - name: ibc-customers-db
+    databaseName: ibc_customers
+    user: ibc_user
