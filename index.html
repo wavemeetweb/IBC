@@ -9,6 +9,7 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
   <style>
+    /* Full CSS styles included for design and responsiveness */
     :root {
       --primary-color: #3b82f6;
       --primary-dark: #1e40af;
@@ -49,7 +50,6 @@
     .hidden {
       display: none !important;
     }
-    /* Login Page Styles */
     .login-container {
       display: flex;
       align-items: center;
@@ -154,7 +154,6 @@
       margin-bottom: 16px;
       font-size: 14px;
     }
-    /* Dashboard Styles */
     .dashboard {
       min-height: 100vh;
       background: var(--gray-100);
@@ -383,7 +382,6 @@
       animation: fadeIn 0.3s ease-out;
     }
   </style>
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
@@ -694,7 +692,7 @@
         showFormError("Please enter a valid email address.");
         return;
       }
-      if (customers.some((cust) => cust.mobile === mobile)) {
+      if (customers.some(c => c.mobile === mobile)) {
         showFormError("A customer with this mobile number already exists.");
         return;
       }
@@ -721,13 +719,10 @@
       const searchTerm = e.target.value.toLowerCase();
       const filteredCustomers = customers.filter(
         (customer) =>
-          (customer.name &&
-            customer.name.toLowerCase().includes(searchTerm)) ||
+          (customer.name && customer.name.toLowerCase().includes(searchTerm)) ||
           customer.mobile.includes(searchTerm) ||
-          (customer.email &&
-            customer.email.toLowerCase().includes(searchTerm)) ||
-          (customer.reason &&
-            customer.reason.toLowerCase().includes(searchTerm))
+          (customer.email && customer.email.toLowerCase().includes(searchTerm)) ||
+          (customer.reason && customer.reason.toLowerCase().includes(searchTerm))
       );
       renderCustomers(filteredCustomers);
     }
@@ -824,6 +819,36 @@
       customerFormSuccess.classList.add("hidden");
     }
     window.showSection = showSection;
+
+    function showLogin() {
+      loginPage.classList.remove("hidden");
+      dashboard.classList.add("hidden");
+      document.getElementById("staffId").value = "";
+      document.getElementById("password").value = "";
+      hideError();
+    }
+
+    function showDashboard() {
+      loginPage.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+      showSection("add");
+      renderCustomers();
+    }
+
+    function showSection(section) {
+      document
+        .getElementById("addCustomerTab")
+        .classList.toggle("active", section === "add");
+      document
+        .getElementById("viewCustomersTab")
+        .classList.toggle("active", section === "view");
+      addCustomerSection.classList.toggle("hidden", section !== "add");
+      viewCustomersSection.classList.toggle("hidden", section !== "view");
+      hideFormMessages();
+      if (section === "view") {
+        renderCustomers();
+      }
+    }
   </script>
 </body>
 </html>
