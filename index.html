@@ -1,423 +1,243 @@
-import React, { useState, useEffect } from 'react';
-import { FiUser, FiLock, FiPhone, FiMail, FiMessageSquare, FiPlus, FiSearch, FiTrash2, FiLogOut, FiUsers, FiCalendar, FiClock } from 'react-icons/fi';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBC Entries | Professional Intake</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
 
-interface Customer {
-  id: string;
-  name: string;
-  mobileNumber: string;
-  email?: string;
-  reason: string;
-  createdAt: string;
-  createdBy: string;
-}
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <header class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+        <div>
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Service Intake</h1>
+            <p class="text-slate-500 mt-1">Real-time customer database for IBC Entries.</p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="exportToCSV()" class="bg-white border border-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-semibold shadow-sm hover:bg-slate-50 transition flex items-center">
+                <i class="fas fa-file-export mr-2 text-blue-500"></i> Export CSV
+            </button>
+            <div class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-200 flex items-center">
+                <i class="fas fa-cloud mr-2"></i> System Online
+            </div>
+        </div>
+    </header>
 
-const CustomerDatabaseApp: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    mobileNumber: '',
-    email: '',
-    reason: ''
-  });
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <aside class="lg:col-span-4">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 sticky top-10">
+                <h2 class="text-xl font-bold mb-6 text-slate-800">Register New Item</h2>
+                <form id="customerForm" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Customer Identity</label>
+                        <input type="text" id="name" placeholder="Full Name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
+                   
+                    <div class="grid grid-cols-1 gap-4">
+                        <input type="email" id="email" placeholder="Email Address" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="tel" id="phone" placeholder="Phone Number" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
 
-  useEffect(() => {
-    const storedCustomers = localStorage.getItem('customerDatabase');
-    if (storedCustomers) {
-      setCustomers(JSON.parse(storedCustomers));
-    }
-  }, []);
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Service Details</label>
+                        <select id="reason" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none mb-3">
+                            <option>General Repair</option>
+                            <option>Warranty Claim</option>
+                            <option>Maintenance</option>
+                            <option>Battery Replacement</option>
+                            <option>Screen Repair</option>
+                        </select>
+                        <input type="text" id="item" required placeholder="Item Description (e.g. iPhone 14)" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    if (username === 'IbcParalakhemundi' && password === 'Ibc@123') {
-      setIsAuthenticated(true);
-      setUsername(username);
-    } else {
-      setError('Invalid credentials. Please try again.');
-    }
-  };
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Purchase Date</label>
+                            <input type="date" id="purchaseDate" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Intake Date</label>
+                            <input type="date" id="takenDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                        </div>
+                    </div>
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUsername('');
-    setPassword('');
-    setShowAddForm(false);
-    setFormData({ name: '', mobileNumber: '', email: '', reason: '' });
-  };
+                    <button type="submit" id="submitBtn" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-xl transition-all transform active:scale-[0.98] flex justify-center items-center mt-4">
+                        <i class="fas fa-save mr-2"></i> Save to Cloud
+                    </button>
+                </form>
+            </div>
+        </aside>
 
-  const handleAddCustomer = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name || !formData.mobileNumber || !formData.reason) {
-      setError('Please fill in all required fields.');
-      return;
-    }
+        <main class="lg:col-span-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <h3 class="font-bold text-slate-800 text-lg">Active Service Records</h3>
+                    <div class="relative w-full md:w-72">
+                        <input type="text" id="searchInput" placeholder="Search by name or phone..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm outline-none focus:ring-2 focus:ring-blue-400 transition">
+                        <i class="fas fa-search absolute left-4 top-3.5 text-slate-400 text-xs"></i>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-50 text-[11px] uppercase tracking-widest text-slate-500 font-bold border-b border-slate-100">
+                                <th class="px-6 py-4">Customer Info</th>
+                                <th class="px-6 py-4">Item & Status</th>
+                                <th class="px-6 py-4">Timeline</th>
+                                <th class="px-6 py-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entriesTable" class="divide-y divide-slate-50">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
 
-    const newCustomer: Customer = {
-      id: Date.now().toString(),
-      name: formData.name,
-      mobileNumber: formData.mobileNumber,
-      email: formData.email || undefined,
-      reason: formData.reason,
-      createdAt: new Date().toISOString(),
-      createdBy: username
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCkEY53b__7G3FxxJoKINCGAfbCnzeLSNQ",
+        authDomain: "ibcentries.firebaseapp.com",
+        projectId: "ibcentries",
+        storageBucket: "ibcentries.firebasestorage.app",
+        messagingSenderId: "944504818551",
+        appId: "1:944504818551:web:3f1c01e3961e11553c6f72",
+        measurementId: "G-9702L9TD11"
     };
 
-    const updatedCustomers = [...customers, newCustomer];
-    setCustomers(updatedCustomers);
-    localStorage.setItem('customerDatabase', JSON.stringify(updatedCustomers));
-    
-    setFormData({ name: '', mobileNumber: '', email: '', reason: '' });
-    setShowAddForm(false);
-    setError('');
-  };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const entriesCollection = collection(db, "customers");
 
-  const handleDeleteCustomer = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this customer record?')) {
-      const updatedCustomers = customers.filter(customer => customer.id !== id);
-      setCustomers(updatedCustomers);
-      localStorage.setItem('customerDatabase', JSON.stringify(updatedCustomers));
-    }
-  };
+    let allEntries = []; // Local cache for filtering
 
-  const filteredCustomers = customers.filter(customer =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.mobileNumber.includes(searchTerm) ||
-    (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    customer.reason.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    // SAVE DATA
+    document.getElementById('customerForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Syncing...';
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+        try {
+            await addDoc(entriesCollection, {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                reason: document.getElementById('reason').value,
+                item: document.getElementById('item').value,
+                purchaseDate: document.getElementById('purchaseDate').value,
+                takenDate: document.getElementById('takenDate').value,
+                createdAt: new Date()
+            });
+            Swal.fire({ icon: 'success', title: 'Entry Saved', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+            e.target.reset();
+        } catch (err) {
+            Swal.fire({ icon: 'error', title: 'Upload Failed', text: err.message });
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save mr-2"></i> Save to Cloud';
+        }
+    };
+
+    // READ & DISPLAY DATA
+    const q = query(entriesCollection, orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+        allEntries = [];
+        const tableBody = document.getElementById('entriesTable');
+        tableBody.innerHTML = '';
+       
+        snapshot.forEach((doc) => {
+            const data = { id: doc.id, ...doc.data() };
+            allEntries.push(data);
+            renderRow(data);
+        });
     });
-  };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-4">
-              <FiUsers className="w-8 h-8 text-indigo-600" />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900">Customer Database</h1>
-            <p className="text-gray-600 mt-2">Secure Access Portal</p>
-          </div>
-          
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
-              </label>
-              <div className="relative">
-                <FiUser className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="Enter username"
-                  required
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <FiLock className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="Enter password"
-                  required
-                />
-              </div>
-            </div>
-            
-            {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-            
-            <button
-              type="submit"
-              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-200 font-medium"
-            >
-              Sign In
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
+    function renderRow(data) {
+        const tableBody = document.getElementById('entriesTable');
+        const row = `
+            <tr class="hover:bg-slate-50/80 transition group">
+                <td class="px-6 py-5">
+                    <div class="font-bold text-slate-900">${data.name}</div>
+                    <div class="text-xs text-slate-400 font-medium">${data.phone} • ${data.email}</div>
+                </td>
+                <td class="px-6 py-5">
+                    <span class="inline-block px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase mb-1">${data.reason}</span>
+                    <div class="text-sm text-slate-600">${data.item}</div>
+                </td>
+                <td class="px-6 py-5">
+                    <div class="text-[11px] text-slate-500 italic">In: ${data.takenDate}</div>
+                    <div class="text-[11px] text-slate-400">Pur: ${data.purchaseDate || 'N/A'}</div>
+                </td>
+                <td class="px-6 py-5 text-right">
+                    <button onclick="window.deleteEntry('${data.id}')" class="p-2 text-slate-300 hover:text-red-500 transition">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tableBody.insertAdjacentHTML('beforeend', row);
+    }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3">
-                  <FiUsers className="w-5 h-5 text-white" />
-                </div>
-                <h1 className="text-xl font-semibold text-gray-900">Customer Database</h1>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, {username}</span>
-              <button
-                onClick={handleLogout}
-                className="flex items-center text-gray-600 hover:text-gray-900 transition"
-              >
-                <FiLogOut className="w-5 h-5" />
-                <span className="ml-2 text-sm font-medium">Logout</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+    // SEARCH FILTER
+    document.getElementById('searchInput').oninput = (e) => {
+        const term = e.target.value.toLowerCase();
+        const tableBody = document.getElementById('entriesTable');
+        tableBody.innerHTML = '';
+        allEntries.filter(entry =>
+            entry.name.toLowerCase().includes(term) ||
+            entry.phone.includes(term)
+        ).forEach(renderRow);
+    };
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Customer Records</h2>
-              <p className="text-gray-600 mt-1">Manage and view all customer information</p>
-            </div>
-            <button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-            >
-              <FiPlus className="w-5 h-5 mr-2" />
-              Add Customer
-            </button>
-          </div>
-        </div>
+    // DELETE ACTION
+    window.deleteEntry = async (id) => {
+        const result = await Swal.fire({
+            title: 'Delete Record?',
+            text: "This cannot be undone in the database.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, Delete'
+        });
 
-        {showAddForm && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Customer</h3>
-            <form onSubmit={handleAddCustomer} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Customer name"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Mobile Number *
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.mobileNumber}
-                    onChange={(e) => setFormData({...formData, mobileNumber: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="10-digit mobile number"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="customer@email.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Reason/Issue *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.reason}
-                    onChange={(e) => setFormData({...formData, reason: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Reason for visit"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowAddForm(false)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-                >
-                  Save Customer
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="p-4 border-b border-gray-200">
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="Search customers..."
-              />
-            </div>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer Details
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Reason/Issue
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date & Time
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredCustomers.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                      <div className="flex flex-col items-center">
-                        <FiUsers className="w-12 h-12 text-gray-300 mb-3" />
-                        <p>No customer records found</p>
-                        <p className="text-sm mt-1">Add your first customer to get started</p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredCustomers.map((customer) => (
-                    <tr key={customer.id} className="hover:bg-gray-50 transition">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
-                            <FiUser className="w-5 h-5 text-indigo-600" />
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {customer.name}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              Added by {customer.createdBy}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          <div className="flex items-center">
-                            <FiPhone className="w-4 h-4 text-gray-400 mr-2" />
-                            {customer.mobileNumber}
-                          </div>
-                          {customer.email && (
-                            <div className="flex items-center mt-1">
-                              <FiMail className="w-4 h-4 text-gray-400 mr-2" />
-                              <span className="text-xs text-gray-600">{customer.email}</span>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-start">
-                          <FiMessageSquare className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
-                          <div className="text-sm text-gray-900">
-                            {customer.reason}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          <div className="flex items-center">
-                            <FiCalendar className="w-4 h-4 text-gray-400 mr-2" />
-                            {formatDate(customer.createdAt).split(',')[0]}
-                          </div>
-                          <div className="flex items-center mt-1">
-                            <FiClock className="w-4 h-4 text-gray-400 mr-2" />
-                            <span className="text-xs text-gray-600">
-                              {formatDate(customer.createdAt).split(',')[1]}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => handleDeleteCustomer(customer.id)}
-                          className="text-red-600 hover:text-red-800 transition"
-                          title="Delete customer"
-                        >
-                          <FiTrash2 className="w-5 h-5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-          
-          {filteredCustomers.length > 0 && (
-            <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
-                Showing {filteredCustomers.length} of {customers.length} customers
-              </p>
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
-  );
+        if(result.isConfirmed) {
+            await deleteDoc(doc(db, "customers", id));
+            Swal.fire({ icon: 'success', title: 'Deleted', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+        }
 };
 
-export default CustomerDatabaseApp;
+    // EXPORT TO CSV
+    window.exportToCSV = () => {
+        if (allEntries.length === 0) return;
+        const headers = ["Name", "Email", "Phone", "Reason", "Item", "PurchaseDate", "IntakeDate"];
+        const csvRows = [headers.join(",")];
+       
+        allEntries.forEach(entry => {
+            const values = [
+                `"${entry.name}"`, `"${entry.email}"`, `"${entry.phone}"`,
+                `"${entry.reason}"`, `"${entry.item}"`, `"${entry.purchaseDate}"`, `"${entry.takenDate}"`
+            ];
+            csvRows.push(values.join(","));
+        });
+
+        const blob = new Blob([csvRows.join("\n")], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `IBC_Entries_${new Date().toLocaleDateString()}.csv`;
+        a.click();
+    };
+</script>
+
+</body>
+</html>
+
